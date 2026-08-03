@@ -94,6 +94,27 @@ select,.btn{padding:11px 14px;border:1px solid var(--line);border-radius:12px;ba
 .viewtabs button{padding:9px 14px;background:var(--card);border:0;color:var(--ink2);cursor:pointer;font-size:14px;font-family:inherit}
 .viewtabs button.active{background:var(--accent);color:#fff}
 .resetbtn{margin-left:auto}
+.rowA{align-items:center}
+.count{white-space:nowrap}
+.filtbtn{display:none}
+.filtbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.advpanel{display:flex;flex-direction:column;gap:10px}
+@media (max-width:720px){
+  .toolbar{padding:10px 0}
+  .toolbar .wrap{gap:9px}
+  .search{order:-1;flex-basis:100%}
+  .rowA{flex-wrap:wrap;gap:8px}
+  .filtbtn{display:inline-flex;align-items:center;gap:6px}
+  .viewtabs{flex:1}
+  .viewtabs button{flex:1}
+  .count{margin-left:auto;color:var(--ink3)}
+  .advpanel{max-height:0;overflow:hidden;gap:0;transition:max-height .28s ease}
+  .toolbar.open .advpanel{max-height:76vh;overflow-y:auto;-webkit-overflow-scrolling:touch;gap:10px;padding:4px 1px 8px}
+  .selrow{flex-direction:column;gap:8px}
+  .selrow select{width:100%}
+  #map{height:340px}
+  .grid{grid-template-columns:1fr}
+}
 
 /* MAP */
 #map{height:460px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);margin:18px 0}
@@ -201,48 +222,53 @@ kbd{background:var(--chip);border:1px solid var(--line);border-radius:5px;paddin
 
 <div class="toolbar">
   <div class="wrap">
-    <div class="searchrow">
+    <div class="searchrow rowA">
       <label class="search">
         <span class="mag">🔎</span>
         <input id="q" type="search" placeholder="Cerca per nome, quartiere, tema…" autocomplete="off" aria-label="Cerca attività">
       </label>
-      <select id="quart" aria-label="Filtra per quartiere"><option value="">Tutti i quartieri</option></select>
-      <select id="giorno" aria-label="Aperto nel giorno">
-        <option value="">Aperto: qualsiasi giorno</option>
-        <option value="0">Aperto lun 3 ago</option>
-        <option value="1">Aperto mar 4 ago</option>
-        <option value="2">Aperto mer 5 ago</option>
-        <option value="3">Aperto gio 6 ago</option>
-        <option value="4">Aperto ven 7 ago</option>
-        <option value="5">Aperto sab 8 ago</option>
-        <option value="6">Aperto dom 9 ago</option>
-      </select>
-      <select id="sort" aria-label="Ordina">
-        <option value="voto">Ordina: voto famiglia</option>
-        <option value="dist">Ordina: vicinanza all'hotel</option>
-        <option value="i9">Ordina: interesse a 9 anni</option>
-        <option value="i14">Ordina: interesse a 14 anni</option>
-        <option value="az">Ordina: A→Z</option>
-      </select>
-    </div>
-    <div class="chips" id="catchips"></div>
-    <div class="toggles">
-      <span class="togglabel">Solo:</span>
-      <button class="chip" data-t="vicino">📍 Vicino all'hotel</button>
-      <button class="chip" data-t="no_pren">✅ Senza prenotazione</button>
-      <button class="chip" data-t="bagni">🚻 Con bagni</button>
-      <button class="chip" data-t="ristoro">☕ Con ristoro</button>
-      <button class="chip" data-t="pioggia">🌧️ Riparo pioggia top</button>
-      <button class="chip" data-t="k9">🧒 Adatto 9 anni</button>
-      <button class="chip" data-t="k14">🧑 Adatto 14 anni</button>
-    </div>
-    <div class="searchrow">
-      <span class="count"><b id="ncount">0</b> attività trovate</span>
+      <button class="btn filtbtn" id="filttoggle" aria-expanded="false" aria-controls="advpanel">⚙️ Filtri</button>
       <div class="viewtabs" role="tablist">
         <button id="vgrid" class="active">▦ Schede</button>
         <button id="vmap">🗺️ Mappa</button>
       </div>
-      <button class="btn resetbtn" id="reset">↺ Azzera filtri</button>
+      <span class="count"><b id="ncount">0</b> trovate</span>
+    </div>
+    <div class="advpanel" id="advpanel">
+      <div class="searchrow selrow">
+        <select id="quart" aria-label="Filtra per quartiere"><option value="">Tutti i quartieri</option></select>
+        <select id="giorno" aria-label="Aperto nel giorno">
+          <option value="">Aperto: qualsiasi giorno</option>
+          <option value="0">Aperto lun 3 ago</option>
+          <option value="1">Aperto mar 4 ago</option>
+          <option value="2">Aperto mer 5 ago</option>
+          <option value="3">Aperto gio 6 ago</option>
+          <option value="4">Aperto ven 7 ago</option>
+          <option value="5">Aperto sab 8 ago</option>
+          <option value="6">Aperto dom 9 ago</option>
+        </select>
+        <select id="sort" aria-label="Ordina">
+          <option value="voto">Ordina: voto famiglia</option>
+          <option value="dist">Ordina: vicinanza all'hotel</option>
+          <option value="i9">Ordina: interesse a 9 anni</option>
+          <option value="i14">Ordina: interesse a 14 anni</option>
+          <option value="az">Ordina: A→Z</option>
+        </select>
+      </div>
+      <div class="chips" id="catchips"></div>
+      <div class="toggles">
+        <span class="togglabel">Solo:</span>
+        <button class="chip" data-t="vicino">📍 Vicino all'hotel</button>
+        <button class="chip" data-t="no_pren">✅ Senza prenotazione</button>
+        <button class="chip" data-t="bagni">🚻 Con bagni</button>
+        <button class="chip" data-t="ristoro">☕ Con ristoro</button>
+        <button class="chip" data-t="pioggia">🌧️ Riparo pioggia top</button>
+        <button class="chip" data-t="k9">🧒 Adatto 9 anni</button>
+        <button class="chip" data-t="k14">🧑 Adatto 14 anni</button>
+      </div>
+      <div class="searchrow">
+        <button class="btn resetbtn" id="reset">↺ Azzera filtri</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3105,6 +3131,13 @@ function render(){
 }
 
 // ---- EVENTS ----
+const filtBtn=document.getElementById('filttoggle');
+filtBtn.addEventListener('click',()=>{
+  const tb=document.querySelector('.toolbar');
+  const open=tb.classList.toggle('open');
+  filtBtn.classList.toggle('on',open);
+  filtBtn.setAttribute('aria-expanded',open);
+});
 document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value;render();});
 document.getElementById('quart').addEventListener('change',e=>{state.quart=e.target.value;render();});
 document.getElementById('giorno').addEventListener('change',e=>{state.giorno=e.target.value;render();});
