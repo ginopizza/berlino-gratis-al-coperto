@@ -112,12 +112,19 @@ select,.btn{padding:11px 14px;border:1px solid var(--line);border-radius:12px;ba
   .toolbar.open .advpanel{max-height:76vh;overflow-y:auto;-webkit-overflow-scrolling:touch;gap:10px;padding:4px 1px 8px}
   .selrow{flex-direction:column;gap:8px}
   .selrow select{width:100%}
-  #map{height:340px}
   .grid{grid-template-columns:1fr}
+  /* Mobile: la lista viene prima, la mappa sta dietro il tab "Mappa" */
+  body.view-grid #map, body.view-grid #legend, body.view-grid .tophotel{display:none}
+  body.view-map #map{height:82vh}
+  body.view-map #grid{display:none}
+  body.view-grid .maphint{display:block}
 }
 
 /* MAP */
 #map{height:460px;border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);margin:18px 0}
+body.view-map #grid{display:none}
+body.view-map #map{height:72vh}
+.maphint{display:none;font-size:12.5px;color:var(--ink3);margin:2px 0 0}
 .leaflet-popup-content{margin:12px 14px;font-family:inherit}
 .pin{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50% 50% 50% 0;
   transform:rotate(-45deg);box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid #fff;font-size:14px}
@@ -277,6 +284,7 @@ kbd{background:var(--chip);border:1px solid var(--line);border-radius:5px;paddin
   <div class="legend" id="legend"></div>
   <p class="tophotel" id="hotelnote"></p>
   <div id="map"></div>
+  <p class="maphint">🗺️ Su smartphone la mappa è nel tab <b>«Mappa»</b> qui sopra, così le schede restano in primo piano.</p>
   <div class="grid" id="grid"></div>
   <div class="empty hidden" id="empty"><b>Nessuna attività con questi filtri</b>Prova ad allargare la ricerca o azzera i filtri.</div>
 
@@ -3150,14 +3158,17 @@ document.getElementById('catchips').addEventListener('click',e=>{
 document.querySelectorAll('.toggles .chip').forEach(b=>b.addEventListener('click',()=>{
   const t=b.dataset.t; state.toggles[t]=!state.toggles[t]; b.classList.toggle('on',state.toggles[t]); render();
 }));
-document.getElementById('vgrid').addEventListener('click',()=>{state.view='grid';
-  document.getElementById('vgrid').classList.add('active');document.getElementById('vmap').classList.remove('active');
-  document.getElementById('grid').classList.remove('hidden');document.getElementById('map').style.height='460px';
-  setTimeout(()=>map.invalidateSize(),50);});
-document.getElementById('vmap').addEventListener('click',()=>{state.view='map';
-  document.getElementById('vmap').classList.add('active');document.getElementById('vgrid').classList.remove('active');
-  document.getElementById('grid').classList.add('hidden');document.getElementById('map').style.height='72vh';
-  setTimeout(()=>{map.invalidateSize();render();},60);});
+function setView(v){
+  state.view=v;
+  document.body.classList.toggle('view-map', v==='map');
+  document.body.classList.toggle('view-grid', v==='grid');
+  document.getElementById('vmap').classList.toggle('active', v==='map');
+  document.getElementById('vgrid').classList.toggle('active', v==='grid');
+  setTimeout(()=>{ map.invalidateSize(); if(v==='map') render(); },60);
+  if(v==='map') document.getElementById('map').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.getElementById('vgrid').addEventListener('click',()=>setView('grid'));
+document.getElementById('vmap').addEventListener('click',()=>setView('map'));
 document.getElementById('reset').addEventListener('click',()=>{
   state.q='';state.cats.clear();state.quart='';state.giorno='';state.sort='voto';
   Object.keys(state.toggles).forEach(k=>state.toggles[k]=false);
@@ -3171,6 +3182,7 @@ document.getElementById('reset').addEventListener('click',()=>{
 [...new Set(DB.attivita.map(a=>a.quartiere))].sort((a,b)=>a.localeCompare(b,'it'))
   .forEach(q=>{const o=document.createElement('option');o.value=q;o.textContent=q;document.getElementById('quart').appendChild(o);});
 
+document.body.classList.add('view-grid');
 initMap();
 render();
 </script>
